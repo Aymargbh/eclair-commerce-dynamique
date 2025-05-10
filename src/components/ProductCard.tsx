@@ -21,7 +21,8 @@ const ProductCard = ({ product, onSelect }: ProductCardProps) => {
   
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
-    addToCart(product);
+    // Ensure product has a quantity property set to 1 by default
+    addToCart({...product, quantity: 1});
   };
   
   const handleToggleWishlist = (e: React.MouseEvent) => {
