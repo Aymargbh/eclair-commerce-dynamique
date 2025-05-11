@@ -52,7 +52,7 @@ const Cart = () => {
   
   const onSubmit = (formData: CheckoutFormValues) => {
     // Numéro WhatsApp du propriétaire (à remplacer par votre numéro réel)
-    const phoneNumber = "+2290146905492"; // Remplacez par votre numéro avec l'indicatif du pays
+    const phoneNumber = "+22946905492"; // Remplacez par votre numéro avec l'indicatif du pays
     
     // Préparation du message avec les détails de la commande
     const message = formatOrderMessage(formData);
