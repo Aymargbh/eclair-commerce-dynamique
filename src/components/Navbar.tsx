@@ -21,7 +21,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <h1 className="text-xl font-bold text-blue-600">ShopIntuitive</h1>
+            <h1 className="text-xl font-bold text-blue-600">Shop</h1>
           </div>
 
           {/* Desktop Navigation */}
