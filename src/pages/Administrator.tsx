@@ -9,7 +9,7 @@ import ProductManagement from '@/components/admin/ProductManagement';
 import CategoryManagement from '@/components/admin/CategoryManagement';
 import Dashboard from '@/components/admin/Dashboard';
 import OrderManagement from '@/components/admin/OrderManagement';
-import { getProducts, saveProducts, getCategories, saveCategories } from '@/services/storageService';
+import { getProducts, saveProducts, getCategories, saveCategories, clearCache } from '@/services/storageService';
 
 const Administrator = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -22,9 +22,25 @@ const Administrator = () => {
 
   // Chargement des données depuis le localStorage au montage du composant
   useEffect(() => {
-    setProductList(getProducts());
-    setCategoryList(getCategories());
-  }, []);
+    const loadData = () => {
+      try {
+        // Effacer le cache avant de charger pour avoir les données les plus récentes
+        clearCache();
+        setProductList(getProducts());
+        setCategoryList(getCategories());
+        console.log("Données administrateur chargées avec succès");
+      } catch (error) {
+        console.error("Erreur lors du chargement des données:", error);
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Impossible de charger les données",
+        });
+      }
+    };
+
+    loadData();
+  }, [toast]);
 
   const handleLogin = () => {
     setIsAuthenticated(true);
@@ -35,54 +51,138 @@ const Administrator = () => {
   };
 
   const handleUpdateProduct = (updatedProduct: Product) => {
-    const newProductList = productList.map(p => 
-      p.id === updatedProduct.id ? updatedProduct : p
-    );
-    
-    setProductList(newProductList);
-    saveProducts(newProductList); // Sauvegarde dans le localStorage
+    try {
+      const newProductList = productList.map(p => 
+        p.id === updatedProduct.id ? updatedProduct : p
+      );
+      
+      setProductList(newProductList);
+      saveProducts(newProductList); // Sauvegarde dans le localStorage
+      
+      toast({
+        title: "Produit mis à jour",
+        description: "Les modifications ont été enregistrées avec succès",
+      });
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du produit:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "La mise à jour a échoué",
+      });
+    }
   };
 
   const handleAddProduct = (newProduct: Product) => {
-    const updatedProducts = [...productList, newProduct];
-    setProductList(updatedProducts);
-    saveProducts(updatedProducts); // Sauvegarde dans le localStorage
+    try {
+      const updatedProducts = [...productList, newProduct];
+      setProductList(updatedProducts);
+      saveProducts(updatedProducts); // Sauvegarde dans le localStorage
+      
+      toast({
+        title: "Produit ajouté",
+        description: "Le nouveau produit a été enregistré avec succès",
+      });
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du produit:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "L'ajout a échoué",
+      });
+    }
   };
 
   const handleDeleteProduct = (productId: number) => {
-    const updatedProducts = productList.filter(p => p.id !== productId);
-    setProductList(updatedProducts);
-    saveProducts(updatedProducts); // Sauvegarde dans le localStorage
+    try {
+      const updatedProducts = productList.filter(p => p.id !== productId);
+      setProductList(updatedProducts);
+      saveProducts(updatedProducts); // Sauvegarde dans le localStorage
+      
+      toast({
+        title: "Produit supprimé",
+        description: "Le produit a été supprimé avec succès",
+      });
+    } catch (error) {
+      console.error("Erreur lors de la suppression du produit:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "La suppression a échoué",
+      });
+    }
   };
 
   const handleUpdateCategory = (oldId: string, updatedCategory: { id: string; name: string }) => {
-    // Update category in category list
-    const updatedCategories = categoryList.map(c => c.id === oldId ? updatedCategory : c);
-    setCategoryList(updatedCategories);
-    saveCategories(updatedCategories); // Sauvegarde dans le localStorage
-    
-    // Update category in all products if the ID changed
-    if (oldId !== updatedCategory.id) {
-      const updatedProducts = productList.map(p => 
-        p.category === oldId 
-          ? { ...p, category: updatedCategory.id } 
-          : p
-      );
-      setProductList(updatedProducts);
-      saveProducts(updatedProducts); // Sauvegarde dans le localStorage
+    try {
+      // Update category in category list
+      const updatedCategories = categoryList.map(c => c.id === oldId ? updatedCategory : c);
+      setCategoryList(updatedCategories);
+      saveCategories(updatedCategories); // Sauvegarde dans le localStorage
+      
+      // Update category in all products if the ID changed
+      if (oldId !== updatedCategory.id) {
+        const updatedProducts = productList.map(p => 
+          p.category === oldId 
+            ? { ...p, category: updatedCategory.id } 
+            : p
+        );
+        setProductList(updatedProducts);
+        saveProducts(updatedProducts); // Sauvegarde dans le localStorage
+      }
+      
+      toast({
+        title: "Catégorie mise à jour",
+        description: "Les modifications ont été enregistrées avec succès",
+      });
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de la catégorie:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "La mise à jour a échoué",
+      });
     }
   };
 
   const handleAddCategory = (newCategory: { id: string; name: string }) => {
-    const updatedCategories = [...categoryList, newCategory];
-    setCategoryList(updatedCategories);
-    saveCategories(updatedCategories); // Sauvegarde dans le localStorage
+    try {
+      const updatedCategories = [...categoryList, newCategory];
+      setCategoryList(updatedCategories);
+      saveCategories(updatedCategories); // Sauvegarde dans le localStorage
+      
+      toast({
+        title: "Catégorie ajoutée",
+        description: "La nouvelle catégorie a été enregistrée avec succès",
+      });
+    } catch (error) {
+      console.error("Erreur lors de l'ajout de la catégorie:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "L'ajout a échoué",
+      });
+    }
   };
 
   const handleDeleteCategory = (categoryId: string) => {
-    const updatedCategories = categoryList.filter(c => c.id !== categoryId);
-    setCategoryList(updatedCategories);
-    saveCategories(updatedCategories); // Sauvegarde dans le localStorage
+    try {
+      const updatedCategories = categoryList.filter(c => c.id !== categoryId);
+      setCategoryList(updatedCategories);
+      saveCategories(updatedCategories); // Sauvegarde dans le localStorage
+      
+      toast({
+        title: "Catégorie supprimée",
+        description: "La catégorie a été supprimée avec succès",
+      });
+    } catch (error) {
+      console.error("Erreur lors de la suppression de la catégorie:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "La suppression a échoué",
+      });
+    }
   };
 
   const handleGoToSite = () => {

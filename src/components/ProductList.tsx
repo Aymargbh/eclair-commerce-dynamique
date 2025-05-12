@@ -15,11 +15,25 @@ const ProductList = ({ onProductSelect }: ProductListProps) => {
   const { searchQuery, selectedCategory, priceRange } = useProductFilter();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-
-  // Chargement des produits depuis le localStorage
+  
+  // Recharger les produits quand le composant est monté ou revient en focus
   useEffect(() => {
-    const loadedProducts = getProducts();
-    setAllProducts(loadedProducts);
+    const loadProducts = () => {
+      const loadedProducts = getProducts();
+      setAllProducts(loadedProducts);
+      console.log("Produits chargés depuis le stockage:", loadedProducts.length);
+    };
+    
+    // Charger au montage du composant
+    loadProducts();
+    
+    // Ajouter un event listener pour recharger lors du retour sur la page
+    window.addEventListener('focus', loadProducts);
+    
+    // Nettoyer l'event listener lors du démontage du composant
+    return () => {
+      window.removeEventListener('focus', loadProducts);
+    };
   }, []);
 
   // Filtrage des produits
@@ -52,7 +66,7 @@ const ProductList = ({ onProductSelect }: ProductListProps) => {
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-        <h2 className="text-2xl font-bold mb-2 sm:mb-0">Products</h2>
+        <h2 className="text-2xl font-bold mb-2 sm:mb-0">Produits</h2>
         <ProductFilter />
       </div>
       
@@ -75,8 +89,8 @@ const ProductList = ({ onProductSelect }: ProductListProps) => {
       
       {filteredProducts.length === 0 ? (
         <div className="text-center py-10">
-          <h3 className="text-lg font-medium">No products found</h3>
-          <p className="text-gray-500 mt-2">Try changing your filters</p>
+          <h3 className="text-lg font-medium">Aucun produit trouvé</h3>
+          <p className="text-gray-500 mt-2">Essayez de modifier vos filtres ou consultez la page d'administration pour ajouter des produits.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
