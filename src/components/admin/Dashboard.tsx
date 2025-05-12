@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Product } from "@/types/product";
-import { TrendingUp, Package, Category, ListOrdered } from "lucide-react";
+import { TrendingUp, Package, FolderTree, ListOrdered } from "lucide-react";
 
 interface DashboardProps {
   products: Product[];
@@ -24,7 +24,7 @@ const Dashboard = ({ products, categories }: DashboardProps) => {
     {
       title: "Catégories",
       value: totalCategories,
-      icon: Category,
+      icon: FolderTree,
       color: "text-purple-500",
     },
     {

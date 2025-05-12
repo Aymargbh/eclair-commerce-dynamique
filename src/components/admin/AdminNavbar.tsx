@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { BellIcon, LayoutDashboard, Menu, Package, Category, ListOrdered } from "lucide-react";
+import { BellIcon, LayoutDashboard, Menu, Package, FolderTree, ListOrdered } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +17,7 @@ const AdminNavbar = ({ onGoToSite, currentSection, onChangeSection }: AdminNavba
   const navItems = [
     { name: "Tableau de bord", icon: LayoutDashboard, id: "dashboard" },
     { name: "Produits", icon: Package, id: "products" },
-    { name: "Catégories", icon: Category, id: "categories" },
+    { name: "Catégories", icon: FolderTree, id: "categories" },
     { name: "Commandes", icon: ListOrdered, id: "orders" },
   ];
 
