@@ -1,8 +1,6 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { products as initialProducts } from '@/data/products';
-import { categories as initialCategories } from '@/data/categories';
 import { useToast } from '@/components/ui/use-toast';
 import { Product } from '@/types/product';
 import AdminNavbar from '@/components/admin/AdminNavbar';
@@ -11,15 +9,22 @@ import ProductManagement from '@/components/admin/ProductManagement';
 import CategoryManagement from '@/components/admin/CategoryManagement';
 import Dashboard from '@/components/admin/Dashboard';
 import OrderManagement from '@/components/admin/OrderManagement';
+import { getProducts, saveProducts, getCategories, saveCategories } from '@/services/storageService';
 
 const Administrator = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [productList, setProductList] = useState<Product[]>(initialProducts);
-  const [categoryList, setCategoryList] = useState<typeof initialCategories>(initialCategories);
+  const [productList, setProductList] = useState<Product[]>([]);
+  const [categoryList, setCategoryList] = useState<{ id: string; name: string }[]>([]);
   const [currentSection, setCurrentSection] = useState("dashboard");
   
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Chargement des données depuis le localStorage au montage du composant
+  useEffect(() => {
+    setProductList(getProducts());
+    setCategoryList(getCategories());
+  }, []);
 
   const handleLogin = () => {
     setIsAuthenticated(true);
@@ -35,40 +40,49 @@ const Administrator = () => {
     );
     
     setProductList(newProductList);
+    saveProducts(newProductList); // Sauvegarde dans le localStorage
   };
 
   const handleAddProduct = (newProduct: Product) => {
-    setProductList(prev => [...prev, newProduct]);
+    const updatedProducts = [...productList, newProduct];
+    setProductList(updatedProducts);
+    saveProducts(updatedProducts); // Sauvegarde dans le localStorage
   };
 
   const handleDeleteProduct = (productId: number) => {
-    setProductList(prev => prev.filter(p => p.id !== productId));
+    const updatedProducts = productList.filter(p => p.id !== productId);
+    setProductList(updatedProducts);
+    saveProducts(updatedProducts); // Sauvegarde dans le localStorage
   };
 
   const handleUpdateCategory = (oldId: string, updatedCategory: { id: string; name: string }) => {
     // Update category in category list
-    setCategoryList(prev => 
-      prev.map(c => c.id === oldId ? updatedCategory : c)
-    );
+    const updatedCategories = categoryList.map(c => c.id === oldId ? updatedCategory : c);
+    setCategoryList(updatedCategories);
+    saveCategories(updatedCategories); // Sauvegarde dans le localStorage
     
     // Update category in all products if the ID changed
     if (oldId !== updatedCategory.id) {
-      setProductList(prev => 
-        prev.map(p => 
-          p.category === oldId 
-            ? { ...p, category: updatedCategory.id } 
-            : p
-        )
+      const updatedProducts = productList.map(p => 
+        p.category === oldId 
+          ? { ...p, category: updatedCategory.id } 
+          : p
       );
+      setProductList(updatedProducts);
+      saveProducts(updatedProducts); // Sauvegarde dans le localStorage
     }
   };
 
   const handleAddCategory = (newCategory: { id: string; name: string }) => {
-    setCategoryList(prev => [...prev, newCategory]);
+    const updatedCategories = [...categoryList, newCategory];
+    setCategoryList(updatedCategories);
+    saveCategories(updatedCategories); // Sauvegarde dans le localStorage
   };
 
   const handleDeleteCategory = (categoryId: string) => {
-    setCategoryList(prev => prev.filter(c => c.id !== categoryId));
+    const updatedCategories = categoryList.filter(c => c.id !== categoryId);
+    setCategoryList(updatedCategories);
+    saveCategories(updatedCategories); // Sauvegarde dans le localStorage
   };
 
   const handleGoToSite = () => {

@@ -5,7 +5,7 @@ import ProductFilter from '@/components/ProductFilter';
 import { Badge } from "@/components/ui/badge";
 import { useProductFilter } from '@/contexts/ProductFilterContext';
 import { Product } from '@/types/product';
-import { products } from '@/data/products';
+import { getProducts } from '@/services/storageService';
 
 interface ProductListProps {
   onProductSelect: (product: Product) => void;
@@ -13,10 +13,18 @@ interface ProductListProps {
 
 const ProductList = ({ onProductSelect }: ProductListProps) => {
   const { searchQuery, selectedCategory, priceRange } = useProductFilter();
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 
+  // Chargement des produits depuis le localStorage
   useEffect(() => {
-    let filtered = products;
+    const loadedProducts = getProducts();
+    setAllProducts(loadedProducts);
+  }, []);
+
+  // Filtrage des produits
+  useEffect(() => {
+    let filtered = allProducts;
     
     // Filter by search query
     if (searchQuery) {
@@ -39,7 +47,7 @@ const ProductList = ({ onProductSelect }: ProductListProps) => {
     );
     
     setFilteredProducts(filtered);
-  }, [searchQuery, selectedCategory, priceRange]);
+  }, [searchQuery, selectedCategory, priceRange, allProducts]);
 
   return (
     <div>
